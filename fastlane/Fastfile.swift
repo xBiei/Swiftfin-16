@@ -112,13 +112,15 @@ class Fastfile: LaneFile {
             xcodes(version: xcodeVersion)
         }
         
-        buildApp(
+          buildApp(
             scheme: .userDefined(scheme),
             exportMethod: .userDefined("development"),
-            skipArchive: .userDefined(true),
+            skipArchive: .userDefined(false),
             skipCodesigning: .userDefined(true),
             xcargs: .userDefined("-skipMacroValidation"),
-            skipProfileDetection: true
+            skipProfileDetection: true,
+            outputDirectory: .userDefined("./build"),
+            outputName: .userDefined("\(scheme).ipa")
         )
     }
     
