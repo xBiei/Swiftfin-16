@@ -19,15 +19,12 @@ jobs:
       matrix:
         scheme:
           - "Swiftfin"
-          - "Swiftfin tvOS"
 
     runs-on: macos-15
 
     env:
       XCODE_VERSION: "16.4"
       IOS_VERSION: "16.4"
-      TVOS_VERSION: "18"
-      TVOS_SIMULATOR: "Apple TV 4K"
       IPHONE_SIMULATOR: "iPhone 13 Pro"
 
     steps:    
@@ -66,3 +63,26 @@ jobs:
           command: sudo fastlane buildLane \
             scheme:"\"${{ matrix.scheme }}\"" \
             xcodeVersion:${{ env.XCODE_VERSION }}
+
+      - name: Pass package name
+        id: package_name
+        run: |
+          echo "package=$(ls -t main/packages | head -n1)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.package_name.outputs.package }}
+          path: ${{ github.workspace }}/main/packages/${{ steps.package_name.outputs.package }}
+          if-no-files-found: error
+
+      - name: Create Draft Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v1.5
+          name: v1.5
+          files: main/packages/${{ steps.package_name.outputs.package }}
+          draft: true
