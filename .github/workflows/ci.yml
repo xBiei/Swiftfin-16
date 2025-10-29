@@ -64,25 +64,25 @@ jobs:
             scheme:"\"${{ matrix.scheme }}\"" \
             xcodeVersion:${{ env.XCODE_VERSION }}
 
-      - name: Pass package name
-        id: package_name
+      - name: Find and verify IPA
+        id: find_ipa
         run: |
-          echo "package=$(ls -t main/packages | head -n1)" >> "$GITHUB_OUTPUT"
+          IPA_FILE=$(find ./build -name "*.ipa" -type f -print -quit 2>/dev/null || find . -name "*.ipa" -type f -print -quit)
+          if [ -n "$IPA_FILE" ]; then
+            echo "ipa_path=$IPA_FILE" >> "$GITHUB_OUTPUT"
+            echo "ipa_name=$(basename $IPA_FILE)" >> "$GITHUB_OUTPUT"
+            echo "✅ Found IPA: $IPA_FILE"
+            ls -lh "$IPA_FILE"
+          else
+            echo "❌ No IPA file found!"
+            echo "Searching in workspace:"
+            find . -type f -name "*.ipa" || echo "No .ipa files anywhere"
+            exit 1
+          fi
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.package_name.outputs.package }}
-          path: ${{ github.workspace }}/main/packages/${{ steps.package_name.outputs.package }}
+          name: ${{ steps.find_ipa.outputs.ipa_name }}
+          path: ${{ steps.find_ipa.outputs.ipa_path }}
           if-no-files-found: error
-
-      - name: Create Draft Release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v1.5
-          name: v1.5
-          files: main/packages/${{ steps.package_name.outputs.package }}
-          draft: true
