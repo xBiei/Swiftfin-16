@@ -67,7 +67,7 @@ jobs:
       - name: Find and verify IPA
         id: find_ipa
         run: |
-          IPA_FILE=$(find ./build -name "*.ipa" -type f -print -quit 2>/dev/null || find . -name "*.ipa" -type f -print -quit)
+          IPA_FILE=$(find ./ -name "*.ipa" -type f -print -quit 2>/dev/null || find . -name "*.ipa" -type f -print -quit)
           if [ -n "$IPA_FILE" ]; then
             echo "ipa_path=$IPA_FILE" >> "$GITHUB_OUTPUT"
             echo "ipa_name=$(basename $IPA_FILE)" >> "$GITHUB_OUTPUT"
