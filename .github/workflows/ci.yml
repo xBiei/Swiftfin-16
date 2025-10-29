@@ -25,10 +25,10 @@ jobs:
 
     env:
       XCODE_VERSION: "16.4"
-      IOS_VERSION: "18"
+      IOS_VERSION: "16.4"
       TVOS_VERSION: "18"
       TVOS_SIMULATOR: "Apple TV 4K"
-      IPHONE_SIMULATOR: "iPhone 16 Pro"
+      IPHONE_SIMULATOR: "iPhone 13 Pro"
 
     steps:    
       - name: Checkout
